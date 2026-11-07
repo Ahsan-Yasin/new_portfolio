@@ -36,7 +36,7 @@ export const seedContent: Content = {
     availabilityLabel: 'Currently at FloLabs',
     socials: [
       { id: 'github', label: 'GitHub', url: 'https://github.com/Ahsan-Yasin', icon: 'github' },
-      { id: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com/in/ahsan-yasin', icon: 'linkedin' },
+      { id: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com/in/ahsan-004524252', icon: 'linkedin' },
       { id: 'mail', label: 'Email', url: 'mailto:m.ahsan79009@gmail.com', icon: 'mail' },
     ],
   },
