@@ -155,11 +155,11 @@ export const seedProjects: Project[] = [
     "id": "highlight-cutter",
     "slug": "highlight-cutter",
     "title": "Highlight Cutter",
-    "summary": "A Python tool that edits meeting recordings into clean videos and shorts. It’s deployed and in use at FloLabs.",
+    "summary": "Turns a raw meeting recording into a finished video, vertical shorts, a video of everything it cut and a report of why. It’s deployed and in use at FloLabs.",
     "published": true,
     "cover": {
       "src": "/projects/highlight-cutter-cover.webp",
-      "alt": "Highlight Cutter on desktop and phone, with a finished video and a transcript showing cut text struck through and kept text highlighted",
+      "alt": "The Highlight Cutter results page for a synthetic demo meeting: the final video, downloads, shorts and the YouTube panel, with a short on a phone in front",
       "kind": "image",
       "width": 2000,
       "height": 1200
@@ -179,21 +179,16 @@ export const seedProjects: Project[] = [
     "tags": [
       "Python",
       "FastAPI",
-      "WhisperX",
-      "Gemini",
       "ffmpeg",
-      "Video processing"
+      "LLM",
+      "Zoom API",
+      "YouTube API"
     ],
     "metrics": [
       {
         "id": "m1",
         "value": "In use",
         "label": "Deployed at FloLabs"
-      },
-      {
-        "id": "m2",
-        "value": "75",
-        "label": "Automated tests, all passing"
       }
     ],
     "links": [],
@@ -206,19 +201,19 @@ export const seedProjects: Project[] = [
       {
         "id": "b2",
         "type": "text",
-        "text": "Highlight Cutter takes a raw meeting recording, removes the noise, and slices it into a clean, edited version. It can also generate shorts, and assemble a final video with an opening, highlights, the edited meeting, and a closing.\n\nYou give it a link or a recording and pick a mode: highlights keeps only the best moments, and light cleanup keeps almost everything while cutting crosstalk, filler and meeting housekeeping. The result page plays the new video and shows the transcript marked up like a copy editor’s page, struck through where it was cut. It’s deployed and in use at FloLabs, where I work as an Intern and Co-Team Lead."
+        "text": "Highlight Cutter takes a Zoom recording, a YouTube link or an uploaded file and produces one zip per meeting: the final video with the highlights reel first and the cleaned meeting after it, vertical shorts with burned-in captions, a video of every cut labelled with its time and reason, a PDF report, transcripts and YouTube chapters.\n\nIt reuses the platform’s own transcript when there is one, an AI pass judges every sentence, and ffmpeg does the cutting. It’s deployed and in use at FloLabs, where I work as an Intern and Co-Team Lead. The screenshots here show a synthetic demo meeting with fictional people, not a real recording."
       },
       {
         "id": "b3",
         "type": "media",
         "media": {
           "src": "/projects/highlight-cutter-1.webp",
-          "alt": "A finished job with a video player above a transcript marked with strikethrough and yellow highlights",
+          "alt": "A finished job for a synthetic demo meeting, with every stage ticked and a table of what the AI picked",
           "kind": "image",
           "width": 1600,
           "height": 1000
         },
-        "caption": "The marked-up transcript: struck-through text was cut and highlighted text stayed. This run used a test clip and a made-up transcript, with the keep or cut choices set by a fixed list instead of Gemini.",
+        "caption": "A finished job on a synthetic demo meeting: every stage ticked, the uploaded transcript reused, and what the AI picked for the reel and shorts.",
         "size": "wide",
         "color": "#FBE6E2"
       },
@@ -232,11 +227,11 @@ export const seedProjects: Project[] = [
         "type": "list",
         "title": "",
         "items": [
-          "FastAPI runs each job in the background through ingest, transcription, an LLM keep-or-remove pass, an edit list and ffmpeg cutting, saving its state after every stage.",
-          "Transcripts come from WhisperX with speaker diarization, or from existing captions when they parse, with a fallback to WhisperX when they don't.",
-          "The Gemini pass sends up to 40 segments per call, splits a batch in half if the reply gets cut off, and backs off on rate limits.",
-          "The edit list treats LLM output as untrusted: it sorts and merges ranges, snaps cuts to word boundaries, drops tiny pieces, and keeps the full video if nothing is left.",
-          "ffmpeg stream-copies clips that start within 2 seconds of a keyframe and re-encodes the rest, then joins them."
+          "A FastAPI service with a single-worker job queue. Each job moves through ingest, transcription, the AI decisions, the edit list, then rendering and packaging.",
+          "The AI judges each sentence keep or remove and scores highlights, then re-ranks the best moments and writes the chapters. Claude Haiku is the default, with OpenAI and Gemini as options.",
+          "Every cut lands on a whole source frame, and every piece is checked for frame count and encoder settings before it’s joined, so a mismatch fails the job instead of shipping a broken file.",
+          "Silence detection measures the audio itself and adapts to each recording, so a quiet speaker isn’t cut.",
+          "It can publish to YouTube: the shorts first, then the full video with chapters and links to them, and a published video is never uploaded twice."
         ]
       },
       {
@@ -244,12 +239,26 @@ export const seedProjects: Project[] = [
         "type": "media",
         "media": {
           "src": "/projects/highlight-cutter-2.webp",
-          "alt": "A job in progress showing 11 of 22 segments judged, with a checklist of pipeline stages",
+          "alt": "A clip labelled Removed 00:00 to 01:34, housekeeping, above two vertical shorts with captions",
           "kind": "image",
           "width": 1600,
           "height": 1000
         },
-        "caption": "Progress counts real units of work, like segments judged. It shows no percentage during transcription, because that stage can't be measured.",
+        "caption": "Every cut of a second or more is in its own video, labelled with its time and reason, and the shorts come ready to post.",
+        "size": "inset",
+        "color": "#FBE6E2"
+      },
+      {
+        "id": "b7",
+        "type": "media",
+        "media": {
+          "src": "/projects/highlight-cutter-3.webp",
+          "alt": "The PDF report, listing highlights, shorts, YouTube chapters and removed parts with reasons",
+          "kind": "image",
+          "width": 1600,
+          "height": 1000
+        },
+        "caption": "The PDF report: highlights, shorts, chapters and every removal with its reason.",
         "size": "inset",
         "color": "#FBE6E2"
       }
