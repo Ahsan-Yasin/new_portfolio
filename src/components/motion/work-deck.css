@@ -1,0 +1,562 @@
+/*
+ * Selected work, and the case study hero it morphs into, share one idea: every project
+ * is a dark room with one lit wall, painted in the project's colour. .lit derives the whole
+ * palette from --c, so any hex works; because type sits on the dark room or a paper plate,
+ * never on the colour itself, it stays readable whatever the owner picks.
+ *
+ * Nothing in here animates, and there are no filters: .deck-inner scales on scroll, so
+ * all the light is plain gradients, and the grain is a small tile the browser rasters once.
+ */
+
+.lit {
+  --c: #1d1d1f;
+  --paper: #f4f1ea;
+  --paper-2: rgba(244, 241, 234, 0.76);
+  --hair: rgba(244, 241, 234, 0.17);
+  --ink-plate: #141311;
+  --ink-plate-2: #5f5c55;
+  --r-stage: clamp(20px, 2.2vw, 34px);
+  --inset: clamp(8px, 1.3vw, 20px);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* Browsers without relative colour get plain mixes, which fail softly on extreme hexes. */
+  --room: color-mix(in srgb, var(--c) 7%, #08080a);
+  --l-hot: color-mix(in srgb, var(--c) 70%, #fff);
+  --l-main: var(--c);
+  --l-mid: color-mix(in srgb, var(--c) 58%, #08080a);
+  --l-deep: color-mix(in srgb, var(--c) 28%, #08080a);
+  --l-edge: color-mix(in srgb, var(--c) 14%, #08080a);
+  --l-text: color-mix(in srgb, var(--c) 30%, #fff);
+
+  isolation: isolate;
+  background-color: var(--room);
+  color: var(--paper);
+}
+
+@supports (color: oklch(from white l c h)) {
+  .lit {
+    /* A dark colour still has to catch the light, and a pale one still has to fall off into shadow. */
+    --room: oklch(from var(--c) 0.155 min(c, 0.024) h);
+    --l-hot: oklch(from var(--c) clamp(0.68, calc(l + 0.2), 0.93) calc(c * 0.72) h);
+    --l-main: oklch(from var(--c) clamp(0.46, l, 0.8) c h);
+    --l-mid: oklch(from var(--c) calc(clamp(0.46, l, 0.8) * 0.66) calc(c * 0.9) h);
+    --l-deep: oklch(from var(--c) calc(clamp(0.46, l, 0.8) * 0.44) calc(c * 0.62) h);
+    --l-edge: oklch(from var(--c) calc(clamp(0.46, l, 0.8) * 0.31) calc(c * 0.42) h);
+    --l-text: oklch(from var(--c) max(l, 0.82) min(c, 0.12) h);
+  }
+}
+
+/* Colour spilling out of the stage into the room around it. */
+.lit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    var(--grain),
+    radial-gradient(90% 88% at 42% 100%, color-mix(in srgb, var(--l-main) 22%, transparent), transparent 74%);
+  background-size: 240px, auto;
+  pointer-events: none;
+}
+
+/*
+ * The stage's back wall, painted in the project's colour and lit from the upper left,
+ * so the colour falls away into its own shadow on the far side. The sill darkens last,
+ * which is what seats the device on it.
+ */
+.lit-wall {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--r-stage);
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.28), transparent 22%),
+    radial-gradient(70% 90% at 22% 0%, color-mix(in srgb, var(--l-hot) 46%, transparent), transparent 72%),
+    radial-gradient(130% 150% at 28% -6%, var(--l-main) 0%, var(--l-mid) 48%, var(--l-deep) 80%, var(--l-edge) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+/*
+ * Daylight through louvres, thrown across the wall from a point up and to the left of the
+ * frame. A conic gradient gives the slats their perspective; the mask lets them die out.
+ */
+.lit-wall::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  --sun: color-mix(in srgb, var(--l-hot) 30%, transparent);
+  --fade: linear-gradient(204deg, #000 8%, transparent 74%);
+  background: conic-gradient(
+    from 118deg at 4% -80%,
+    transparent 0deg,
+    var(--sun) 0.5deg,
+    var(--sun) 4deg,
+    transparent 4.5deg,
+    transparent 5.4deg,
+    var(--sun) 5.9deg,
+    var(--sun) 12deg,
+    transparent 12.5deg,
+    transparent 13.4deg,
+    var(--sun) 13.9deg,
+    var(--sun) 15.6deg,
+    transparent 16.1deg,
+    transparent 17deg,
+    var(--sun) 17.5deg,
+    var(--sun) 25deg,
+    transparent 25.6deg,
+    transparent 26.5deg,
+    var(--sun) 27deg,
+    var(--sun) 29deg,
+    transparent 29.5deg,
+    transparent 30.5deg,
+    var(--sun) 31deg,
+    var(--sun) 37deg,
+    transparent 37.6deg,
+    transparent 360deg
+  );
+  -webkit-mask-image: var(--fade);
+  mask-image: var(--fade);
+}
+
+.lit-wall::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--grain) 0 0 / 240px;
+  pointer-events: none;
+}
+
+.lit-rule {
+  flex: 1 1 24px;
+  min-width: 12px;
+  height: 1px;
+  align-self: center;
+  background: var(--hair);
+}
+
+/* The paper label beside the work. */
+.lit-plate {
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--ink-plate);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.3),
+    0 12px 28px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------------------------------------------------------------- The scene */
+
+.deck-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.deck-link {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* The link fills the scene, so its focus ring shows on the one thing that looks clickable. */
+.deck-link:focus-visible {
+  outline: none;
+}
+
+.deck-link:focus-visible .deck-go {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+.deck-copy {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  max-width: none;
+  padding-top: clamp(74px, 10.4svh, 100px);
+}
+
+.deck-rail {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--paper-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.deck-index {
+  color: var(--l-text);
+}
+
+.deck-head {
+  display: grid;
+  row-gap: 10px;
+  margin-top: clamp(10px, 1.7svh, 20px);
+}
+
+.deck-title {
+  max-width: 100%;
+  font-family: var(--font-display-stack);
+  font-size: clamp(2.125rem, min(4.7vw, 9.4svh), 7rem);
+  font-weight: var(--mega-weight, var(--display-weight));
+  font-stretch: var(--mega-stretch, 100%);
+  line-height: 0.98;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.deck-title[data-length='long'] {
+  font-size: clamp(1.75rem, min(3.2vw, 6.6svh), 3.5rem);
+  line-height: 1.02;
+}
+
+.deck-title[data-length='longest'] {
+  font-size: clamp(1.375rem, min(2.2vw, 4.6svh), 2.5rem);
+  line-height: 1.08;
+}
+
+.deck-summary {
+  max-width: 34em;
+  color: var(--paper-2);
+  font-size: clamp(0.9375rem, 0.9rem + 0.18vw, 1.0625rem);
+  line-height: 1.42;
+  letter-spacing: var(--tracking-body);
+  text-wrap: pretty;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+/* Shows only as many chips as fit, so they can never push the art around. */
+.deck-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 28px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.deck-tags li {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding-inline: 11px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-pill);
+  color: var(--paper-2);
+  font-size: 0.75rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- The stage */
+
+.deck-stage {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  margin: clamp(12px, 2svh, 24px) var(--inset) var(--inset);
+  /* Only the sill cuts the art: the device may stand proud of the sides and top. */
+  clip-path: inset(-100vh -100vw 0 -100vw);
+}
+
+.deck-plates {
+  position: relative;
+  z-index: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+}
+
+.deck-metric {
+  width: min(58%, 214px);
+  padding: 12px 14px 13px;
+}
+
+/* As big as the plate allows for its longest word, so no value can ever break mid-word. */
+.deck-metric-fit {
+  container-type: inline-size;
+}
+
+.deck-metric-value {
+  font-family: var(--font-display-stack);
+  font-size: clamp(1.375rem, 1.1rem + 1.3vw, 2.25rem);
+  font-size: min(clamp(1.375rem, 1.1rem + 1.3vw, 2.25rem), calc(100cqi / (var(--chars, 4) * 0.77)));
+  font-weight: var(--mega-weight, var(--display-weight));
+  font-stretch: var(--mega-stretch, 100%);
+  line-height: 1;
+  letter-spacing: var(--tracking-title);
+  font-variant-numeric: tabular-nums;
+  text-wrap: balance;
+}
+
+.deck-metric-label {
+  margin-top: 6px;
+  color: var(--ink-plate-2);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  letter-spacing: -0.006em;
+  text-wrap: pretty;
+}
+
+.deck-go {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  margin-left: auto;
+  padding-inline: 18px 14px;
+  border-radius: var(--r-pill);
+  background: var(--paper);
+  color: var(--ink-plate);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.3),
+    0 10px 24px -8px rgba(0, 0, 0, 0.5);
+  transition: background-color 240ms var(--ease-out);
+}
+
+@media (hover: hover) {
+  .deck-link:hover .deck-go {
+    background: #fff;
+  }
+}
+
+.deck-art {
+  position: relative;
+  z-index: 1;
+  grid-row: 2;
+  align-self: end;
+  height: 100%;
+  will-change: transform;
+}
+
+/* The device's own shadow on the wall, thrown away from the light. */
+.deck-art::before,
+.case-art-scrub::before {
+  content: '';
+  position: absolute;
+  inset: 6% -7% -12% 3%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.26) 62%, transparent);
+  pointer-events: none;
+}
+
+/* A full-bleed picture replaces the wall instead of standing in front of it. */
+.deck-art[data-fit='cover'] {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--r-stage);
+}
+
+.deck-art[data-fit='cover']::before,
+.case-art[data-fit='cover'] .case-art-scrub::before {
+  display: none;
+}
+
+.case-art[data-fit='cover'] .case-art-lean {
+  overflow: hidden;
+  border-radius: var(--r-stage);
+}
+
+/* With no cover, the project's number stands in the light instead. */
+.deck-numeral {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 0;
+  display: block;
+  color: var(--l-main);
+  font-family: var(--font-display-stack);
+  font-size: min(44vw, 60svh);
+  font-weight: var(--mega-weight, var(--display-weight));
+  font-stretch: var(--mega-stretch, 100%);
+  line-height: 0.74;
+  letter-spacing: var(--tracking-display);
+  text-align: center;
+  overflow: hidden;
+}
+
+/*
+ * A recording in a browser window, in place of the cover art. Its width suits the stage's shape:
+ * wide enough to read, and always tall enough that the sill crops the page rather than ending it.
+ */
+.deck-art:has(.lit-window),
+.case-art-lean:has(.lit-window) {
+  container-type: size;
+}
+
+.lit-window {
+  --bar: 32px;
+  --w: min(92cqw, calc(var(--ratio, 1.6) * (100cqh - var(--bar)) * 1.12));
+  position: absolute;
+  inset-inline: calc((100cqw - var(--w)) / 2);
+  top: max(5cqh, calc(100cqh - var(--w) / var(--ratio, 1.6) - var(--bar) + 9cqh));
+  bottom: 0;
+  overflow: hidden;
+  padding-inline: 4px;
+  border-radius: clamp(10px, 1.1vw, 16px) clamp(10px, 1.1vw, 16px) 0 0;
+  background: #121316;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 8px 18px rgba(0, 0, 0, 0.28),
+    0 30px 70px -18px rgba(0, 0, 0, 0.6);
+}
+
+.lit-window-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--bar);
+  padding-inline: 9px;
+  color: var(--paper-2);
+  font-size: 0.6875rem;
+  line-height: 1;
+}
+
+.lit-window-bar i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.lit-window-bar span {
+  position: absolute;
+  inset-inline: 56px;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lit-window-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--ratio, 1.6);
+  border-radius: 4px 4px 0 0;
+  background: #0b0b0c;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.lit-still {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lit-window {
+    display: none;
+  }
+
+  .lit-still {
+    display: block;
+  }
+}
+
+[data-motion='off'] .lit-window {
+  display: none;
+}
+
+[data-motion='off'] .lit-still {
+  display: block;
+}
+
+/* On a phone the art runs larger than the stage, and the frame crops it cleanly on all sides. */
+@media (max-width: 599.98px) {
+  .deck-stage {
+    clip-path: inset(0 round var(--r-stage));
+  }
+
+  .deck-art {
+    margin-inline: -18%;
+  }
+
+  /* A page in a window reads better whole, so it fits the frame instead of running past it. */
+  .lit-window {
+    --bar: 26px;
+    --w: min(calc(100cqw / 1.36 - 16px), calc(var(--ratio, 1.6) * (100cqh - var(--bar)) * 1.12));
+  }
+}
+
+/* The wide layout: title and summary in one band, plates hung on the wall beside the device. */
+@media (min-width: 1100px) and (min-aspect-ratio: 7/5) {
+  .deck-head {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(12px, 1.6vw, 24px);
+    align-items: start;
+  }
+
+  .deck-title {
+    grid-column: 1 / span 8;
+  }
+
+  .deck-head:not(:has(.deck-about)) .deck-title {
+    grid-column: 1 / -1;
+  }
+
+  .deck-about {
+    grid-column: 9 / -1;
+    padding-top: 0.25rem;
+  }
+
+  .deck-stage {
+    display: block;
+  }
+
+  .deck-art {
+    position: absolute;
+    inset: 0;
+    width: 64%;
+    height: 100%;
+    margin-inline: auto;
+  }
+
+  .deck-plates {
+    position: absolute;
+    inset: auto 0 0;
+    align-items: flex-end;
+    padding: clamp(14px, 2.4svh, 24px) calc(var(--gutter) - var(--inset));
+  }
+
+  .deck-metric {
+    width: clamp(168px, 14.2vw, 240px);
+    max-width: none;
+    padding: 14px 16px 15px;
+  }
+}
+
+/* Too short to hold everything: the art and title win. */
+@media (max-height: 560px) {
+  .deck-summary,
+  .deck-tags,
+  .deck-metric {
+    display: none;
+  }
+}

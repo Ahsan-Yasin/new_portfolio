@@ -38,20 +38,20 @@ export function MotionProvider({ level, children }: { level: Theme['motion']; ch
   }, [level]);
 
   // Browser Back and Forward should return to where the visitor was, not to the top.
-  const cameFromHistory = useRef(false);
+  const historyPath = useRef<string | null>(null);
   useEffect(() => {
     const onPopState = () => {
-      cameFromHistory.current = true;
+      historyPath.current = window.location.pathname;
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
   useEffect(() => {
-    const fromHistory = cameFromHistory.current;
-    cameFromHistory.current = false;
+    const fromHistory = historyPath.current === pathname;
 
     if (!fromHistory) {
+      historyPath.current = null;
       const hash = window.location.hash;
       if (hash) {
         lenisRef.current?.scrollTo(hash, { immediate: true, force: true, offset: -72 });

@@ -76,6 +76,7 @@ html.motion-full .case-hero {
   top: 0;
 }
 
+/* The lit room itself comes from .lit in work-deck.css, shared with the home page's scenes. */
 .case-field {
   position: relative;
   display: flex;
@@ -89,35 +90,44 @@ html.motion-full .case-hero {
   position: relative;
   z-index: 2;
   flex: none;
-  padding-top: clamp(84px, 12svh, 128px);
+  max-width: none;
+  padding-top: clamp(74px, 10.4svh, 100px);
 }
 
 .case-bar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px 24px;
-  margin-bottom: clamp(14px, 2.4svh, 28px);
+  align-items: center;
+  gap: 14px;
+  margin-bottom: clamp(10px, 1.7svh, 20px);
+  color: var(--paper-2);
+  font-variant-numeric: tabular-nums;
 }
 
-.case-bar > * {
-  opacity: 0.86;
+.case-bar > :last-child:not(.lit-rule) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.case-bar > :first-child {
+  flex: none;
 }
 
 .case-back {
-  transition: opacity 240ms var(--ease-out);
+  color: var(--paper);
+  transition: color 240ms var(--ease-out);
 }
 
 .case-back:hover {
-  opacity: 1;
+  color: var(--l-text);
 }
 
 /* Sized against the screen's height as well as its width, so it never crowds out the art. */
 .case-title {
   max-width: 100%;
-  font-size: clamp(2.5rem, min(7.4vw, 13svh), 8.5rem);
-  line-height: 0.96;
+  font-size: clamp(2.5rem, min(6.4vw, 11.6svh), 9rem);
+  line-height: 0.98;
   text-wrap: balance;
   overflow-wrap: break-word;
 }
@@ -132,18 +142,14 @@ html.motion-full .case-hero {
   line-height: 1.06;
 }
 
+/* The same framed stage as the scene: the sill cuts the art, while a swell may pass the sides. */
 .case-art {
   position: relative;
   z-index: 1;
   flex: 1 1 auto;
   min-height: clamp(220px, 44svh, 64svh);
-  margin-top: clamp(10px, 2.2svh, 28px);
-}
-
-/* A project with no cover keeps its title centred on the colour. */
-.case-field:not(:has(.case-art)) .case-copy {
-  margin-block: auto;
-  padding-block: clamp(84px, 12svh, 128px);
+  margin: clamp(12px, 2svh, 24px) var(--inset) var(--inset);
+  clip-path: inset(-100vh -100vw 0 -100vw);
 }
 
 .case-art-scrub,
@@ -156,6 +162,17 @@ html.motion-full .case-hero {
 .case-art-scrub,
 .case-art-lean {
   transform-origin: 50% 100%;
+}
+
+/* On a phone the art runs larger than the stage, and the frame crops it cleanly on all sides. */
+@media (max-width: 599.98px) {
+  .case-art {
+    clip-path: inset(0 round var(--r-stage));
+  }
+
+  .case-art .case-art-scrub {
+    inset-inline: -18%;
+  }
 }
 
 /* Perspective only reaches direct children, so it lives on the lean's parent. */

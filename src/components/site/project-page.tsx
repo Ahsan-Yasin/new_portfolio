@@ -5,12 +5,14 @@ import { CaseProgress } from '@/components/motion/case-progress';
 import { CaseStage } from '@/components/motion/case-stage';
 import { CaseWords } from '@/components/motion/case-words';
 import { PageMotion } from '@/components/motion/page-motion';
+import { CoverWindow } from '@/components/motion/work-deck';
 import { safeHref, type Content, type Project } from '@/lib/content/schema';
-import { nextProject, readableOn } from '@/lib/content/select';
+import { nextProject } from '@/lib/content/select';
 import { BigMetrics, Blocks, headingId } from './blocks';
 import { CaseNav } from './case-nav';
 import { Media } from './media';
 import { SiteLink } from './site-link';
+import '@/components/motion/work-deck.css';
 import './inner-pages.css';
 
 /** Very long titles step down, so a title and its art always share one screen. */
@@ -20,21 +22,34 @@ function titleLength(title: string) {
 }
 
 /**
- * A project's full-screen coloured field. The hero of a case study and the "next project"
- * panel of the one before it share this layout, and the ViewTransition, so following that
- * link feels like one continuous move. Cards elsewhere on the site morph into it too.
+ * A project's full-screen lit room. The hero of a case study and the "next project" panel of
+ * the one before it share this layout, and the ViewTransition, so following that link feels
+ * like one continuous move. The home page's scenes and other cards morph into it too.
  */
 function ProjectField({ project, kicker, hero = false }: { project: Project; kicker: ReactNode; hero?: boolean }) {
   const meta = [project.client, project.year, project.role].filter(Boolean).join(' · ');
   const length = titleLength(project.title);
+  const video = project.coverVideo?.src && project.coverVideo.kind === 'video' ? project.coverVideo : null;
+  const still = project.cover.src ? (
+    <Media
+      media={project.cover}
+      fill
+      fit={project.coverFit}
+      position={project.coverFit === 'cover' ? 'center' : 'center bottom'}
+      sizes="(max-width: 599px) 140vw, 90vw"
+      priority={hero}
+    />
+  ) : null;
+  const art = video ? <CoverWindow video={video} title={project.title} still={still} /> : still;
 
   return (
     <ViewTransition name={`cover-${project.id}`} share="morph" default="none">
-      <div className="case-field" style={{ background: project.color, color: readableOn(project.color) }}>
+      <div className="case-field lit" style={{ '--c': project.color } as CSSProperties}>
         <div className="wrap case-copy">
           <div {...(hero ? { 'data-load': '0.3' } : {})} className="case-bar t-small">
             {kicker}
-            {meta ? <span className="tabular-nums">{meta}</span> : null}
+            <span aria-hidden className="lit-rule" />
+            {meta ? <span>{meta}</span> : null}
           </div>
           {hero ? (
             <h1 data-lines="load" data-delay="0.12" data-length={length} className="case-title">
@@ -46,24 +61,16 @@ function ProjectField({ project, kicker, hero = false }: { project: Project; kic
             </h2>
           )}
         </div>
-        {project.cover.src ? (
-          <div className="case-art">
+        <div className="case-art" data-fit={video ? 'contain' : project.coverFit}>
+          <div aria-hidden className="lit-wall" />
+          {art ? (
             <div className="case-art-scrub">
               <div className="case-art-rise">
-                <div className="case-art-lean">
-                  <Media
-                    media={project.cover}
-                    fill
-                    fit={project.coverFit}
-                    position={project.coverFit === 'cover' ? 'center' : 'center bottom'}
-                    sizes="100vw"
-                    priority={hero}
-                  />
-                </div>
+                <div className="case-art-lean">{art}</div>
               </div>
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
         <div aria-hidden className="case-dim" />
       </div>
     </ViewTransition>
@@ -97,7 +104,7 @@ export function ProjectPage({ content, project }: { content: Content; project: P
   const next = nextProject(content, project.slug);
   const facts = [
     { label: 'Role', value: project.role },
-    { label: 'Client', value: project.client },
+    { label: 'For', value: project.client },
     { label: 'Year', value: project.year },
     { label: 'Duration', value: project.duration },
     { label: 'Team', value: project.team },

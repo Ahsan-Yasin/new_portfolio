@@ -55,6 +55,7 @@ function ProjectList() {
       summary: '',
       published: true,
       cover: { src: '', alt: '', kind: 'image' },
+      coverVideo: { src: '', alt: '', kind: 'video' },
       coverFit: 'contain',
       color: '#1d1d1f',
       year: String(new Date().getFullYear()),
@@ -238,6 +239,7 @@ function ProjectFields({ id, cursor }: { id: string; cursor: Cursor<Project> }) 
 
       <Group title="Cover">
         <MediaField label="Cover" cursor={cursor.at('cover')} />
+        <MediaField label="Cover video (optional)" cursor={cursor.at('coverVideo')} />
         <SegmentedRow label="Cover fit" options={FIT_OPTIONS} {...field('coverFit')} />
         <ColorRow label="Card colour" hint="The background of the project card." {...field('color')} />
       </Group>

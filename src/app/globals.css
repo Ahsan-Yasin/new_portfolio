@@ -629,6 +629,11 @@ html.motion-full .deck-first {
   margin-bottom: -100svh;
 }
 
+/* The second project is a headliner too, so it stays on screen longer before the next one slides over. */
+html.motion-full .deck-scene-linger {
+  margin-bottom: 70svh;
+}
+
 html.motion-full .deck-sticky {
   position: sticky;
   top: 0;

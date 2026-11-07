@@ -18,6 +18,8 @@ export const mediaSchema = z.object({
   width: z.number().int().positive().optional(),
   height: z.number().int().positive().optional(),
   blur: z.string().max(4000).optional(),
+  /** A video's still, shown until it starts or when autoplay is blocked. */
+  poster: z.string().max(2000).optional(),
 });
 export type Media = z.infer<typeof mediaSchema>;
 const media = () => mediaSchema.default({ src: '', alt: '', kind: 'image' });
@@ -91,6 +93,8 @@ export const projectSchema = z.object({
   summary: text(),
   published: flag(true),
   cover: media(),
+  /** Optional. Plays in place of the cover art on the project's full-screen scene. The cover stays as the still fallback. */
+  coverVideo: media(),
   coverFit: z.enum(['contain', 'cover']).default('contain'),
   color: hexColor('#1d1d1f'),
   year: text(),

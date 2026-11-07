@@ -1,59 +1,127 @@
 'use client';
 
 import { ArrowUpRight } from 'lucide-react';
-import { ViewTransition, useRef, type CSSProperties } from 'react';
-import type { Project, Section } from '@/lib/content/schema';
-import { readableOn } from '@/lib/content/select';
+import { ViewTransition, useRef, type CSSProperties, type ReactNode } from 'react';
+import type { Media as MediaData, Project, Section } from '@/lib/content/schema';
 import { Media } from '@/components/site/media';
 import { SiteLink } from '@/components/site/site-link';
 import { gsap, LARGE, SMALL, useGSAP } from './gsap';
+import { LoopVideo } from './loop-video';
 import { useMotionLevel } from './motion-provider';
+import './work-deck.css';
+
+/** Very long titles step down, so a title and its art always share one screen. */
+function titleLength(title: string) {
+  if (title.length > 90) return 'longest';
+  return title.length > 48 ? 'long' : undefined;
+}
+
+function longestWord(text: string) {
+  return Math.max(...text.split(/\s+/).map((word) => word.length));
+}
+
+/**
+ * A full-page recording in a browser window that rises from the stage's sill and is cropped
+ * by it. Reduced motion swaps it for the still cover in CSS alone, so nothing depends on render.
+ */
+export function CoverWindow({ video, title, still }: { video: MediaData; title: string; still: ReactNode }) {
+  const ratio = video.width && video.height ? video.width / video.height : 1.6;
+
+  return (
+    <>
+      <div className="lit-window" style={{ '--ratio': ratio } as CSSProperties}>
+        <div aria-hidden className="lit-window-bar">
+          <i />
+          <i />
+          <i />
+          <span>{title}</span>
+        </div>
+        <LoopVideo className="lit-window-video" src={video.src} poster={video.poster || undefined} aria-label={video.alt || undefined} />
+      </div>
+      <div className="lit-still">{still}</div>
+    </>
+  );
+}
 
 function Scene({ project, index, total, priority }: { project: Project; index: number; total: number; priority?: boolean }) {
-  const onColor = readableOn(project.color);
-  const metric = project.metrics[0];
-  const meta = [project.client, project.year].filter(Boolean).join(' · ');
-  const style = { background: project.color, color: onColor } as CSSProperties;
+  const metric = project.metrics.find((item) => item.value);
+  const facts = [project.client, project.year].filter(Boolean).join(' · ');
+  const number = String(index + 1).padStart(2, '0');
+  const style = { '--c': project.color } as CSSProperties;
+  const video = project.coverVideo?.src && project.coverVideo.kind === 'video' ? project.coverVideo : null;
+  const still = project.cover.src ? (
+    <Media
+      media={project.cover}
+      fill
+      fit={project.coverFit}
+      position={project.coverFit === 'cover' ? 'center' : 'center bottom'}
+      sizes="(max-width: 599px) 140vw, 80vw"
+      priority={priority}
+    />
+  ) : null;
 
   return (
     <ViewTransition name={`cover-${project.id}`} share="morph" default="none">
-      <div className="deck-inner relative h-full w-full overflow-hidden will-change-transform" style={style}>
-        <SiteLink href={`/work/${project.slug}`} data-cursor="View project" className="deck-link block h-full w-full" aria-label={project.title}>
-          <div className="wrap relative z-10 pt-[clamp(84px,12vh,120px)]">
-            <div className="deck-meta t-small mb-[clamp(16px,2.2vh,28px)] flex items-center justify-between gap-6 opacity-80">
-              <span className="tabular-nums">
-                {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+      <div className="deck-inner lit" style={style}>
+        <SiteLink href={`/work/${project.slug}`} data-cursor="View project" className="deck-link" aria-label={project.title}>
+          <div className="wrap deck-copy">
+            <div className="deck-meta deck-rail t-small">
+              <span className="deck-index">
+                {number} / {String(total).padStart(2, '0')}
               </span>
-              <span>{meta}</span>
+              <span aria-hidden className="lit-rule" />
+              {facts ? <span>{facts}</span> : null}
             </div>
-            <div className="grid-12 items-start gap-y-3">
-              <div className="col-span-12 lg:col-span-9">
-                <h3 className="deck-title t-deck">{project.title}</h3>
-                {project.summary ? <p className="deck-summary t-lead mt-3 max-w-[32em] opacity-80">{project.summary}</p> : null}
-              </div>
-              {metric?.value ? (
-                <div className="deck-metric col-span-12 hidden text-right lg:col-span-3 lg:block">
-                  <p className="t-figure whitespace-nowrap">{metric.value}</p>
-                  <p className="t-small mt-1 opacity-80">{metric.label}</p>
+            <div className="deck-head">
+              <h3 className="deck-title" data-length={titleLength(project.title)}>
+                {project.title}
+              </h3>
+              {project.summary || project.tags.length ? (
+                <div className="deck-about">
+                  {project.summary ? <p className="deck-summary">{project.summary}</p> : null}
+                  {project.tags.length ? (
+                    <ul className="deck-meta deck-tags">
+                      {project.tags.map((tag) => (
+                        <li key={tag}>{tag}</li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               ) : null}
             </div>
           </div>
-          {project.cover.src ? (
-            <div className="deck-art absolute inset-x-[-34%] bottom-0 h-[52%] will-change-transform md:inset-x-0 md:h-[60%]">
-              <Media
-                media={project.cover}
-                fill
-                fit={project.coverFit}
-                position={project.coverFit === 'cover' ? 'center' : 'center bottom'}
-                sizes="100vw"
-                priority={priority}
-              />
+          <div className="deck-stage">
+            <div aria-hidden className="lit-wall" />
+            {video ? (
+              <div className="deck-art" data-fit="contain">
+                <CoverWindow video={video} title={project.title} still={still} />
+              </div>
+            ) : still ? (
+              <div className="deck-art" data-fit={project.coverFit}>
+                {still}
+              </div>
+            ) : (
+              <span aria-hidden className="deck-numeral">
+                {number}
+              </span>
+            )}
+            <div className="deck-plates">
+              {metric ? (
+                <div className="deck-metric lit-plate">
+                  <div className="deck-metric-fit">
+                    <p className="deck-metric-value" style={{ '--chars': longestWord(metric.value) } as CSSProperties}>
+                      {metric.value}
+                    </p>
+                    {metric.label ? <p className="deck-metric-label">{metric.label}</p> : null}
+                  </div>
+                </div>
+              ) : null}
+              <span aria-hidden className="deck-go">
+                View project
+                <ArrowUpRight size={18} />
+              </span>
             </div>
-          ) : null}
-          <span aria-hidden className="deck-go absolute bottom-5 right-[var(--gutter)] z-10 grid h-12 w-12 place-items-center rounded-full bg-white/90 text-[#1d1d1f] lg:hidden">
-            <ArrowUpRight size={20} />
-          </span>
+          </div>
         </SiteLink>
         <div aria-hidden className="deck-dim pointer-events-none absolute inset-0 z-20 bg-black opacity-0" />
       </div>
@@ -152,7 +220,11 @@ export function WorkDeck({ projects, section }: { projects: Project[]; section: 
         </div>
       </div>
       {rest.map((project, index) => (
-        <div key={project.id} className="deck-scene sticky top-0 h-[100svh] overflow-hidden" style={{ zIndex: index + 2 }}>
+        <div
+          key={project.id}
+          className={`deck-scene sticky top-0 h-[100svh] overflow-hidden${index === 0 ? ' deck-scene-linger' : ''}`}
+          style={{ zIndex: index + 2 }}
+        >
           <Scene project={project} index={index + 1} total={projects.length} />
         </div>
       ))}

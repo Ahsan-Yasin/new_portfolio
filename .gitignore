@@ -46,3 +46,9 @@ next-env.d.ts
 
 # editor and assistant settings
 /.claude
+
+# LinkedIn videos, screenshots and posts: stays on this computer
+/linkedin-kit
+
+# local session notes
+/CLAUDE.md

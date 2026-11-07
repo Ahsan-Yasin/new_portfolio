@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { LoopVideo } from '@/components/motion/loop-video';
 import type { Media as MediaData } from '@/lib/content/schema';
 
 type Props = {
@@ -19,17 +20,15 @@ export function Media({ media, sizes, priority, fit = 'cover', fill, position, c
   const style = fill ? { objectFit: fit, objectPosition: position } : undefined;
 
   if (media.kind === 'video') {
+    const ratio = !fill && media.width && media.height ? { aspectRatio: `${media.width} / ${media.height}` } : undefined;
     return (
-      <video
+      <LoopVideo
         src={media.src}
+        poster={media.poster || undefined}
         aria-label={media.alt || undefined}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
+        controls={!fill}
         className={`${fill ? 'absolute inset-0 h-full w-full' : 'block h-auto w-full'} ${className}`}
-        style={style}
+        style={{ ...style, ...ratio }}
       />
     );
   }
