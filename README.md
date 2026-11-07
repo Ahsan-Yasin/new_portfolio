@@ -10,14 +10,6 @@ Built with Next.js, GSAP, Lenis and Vercel Blob.
 npm install
 ```
 
-Create a file called `.env.local` in the project folder:
-
-```
-ADMIN_PASSWORD=choose-a-long-password-here
-```
-
-The password must be at least 8 characters. Then start the site:
-
 ```bash
 npm run dev
 ```
@@ -29,18 +21,17 @@ The site is at http://localhost:3000 and the admin is at http://localhost:3000/a
 ### Option 1: import this repository
 
 1. Go to [vercel.com/new](https://vercel.com/new) and import this repository.
-2. Under **Environment Variables**, add `ADMIN_PASSWORD` with a password of at least 8 characters.
-3. Click **Deploy**.
-4. In the new project, open **Storage**, then **Create Database**, then **Blob**. Set the access to **Private** and connect it to the project in all environments.
-5. Open **Deployments** and redeploy the latest one, so it picks up the storage connection.
+2. Click **Deploy**.
+3. In the new project, open **Storage**, then **Create Database**, then **Blob**. Set the access to **Private** and connect it to the project in all environments.
+4. Open **Deployments** and redeploy the latest one, so it picks up the storage connection.
 
-The admin can't save until step 4 is done, and it will tell you so.
+The admin can't save until step 3 is done, and it will tell you so.
 
 ### Option 2: one-click deploy
 
 This creates your own copy of the repository, and sets up the storage for you:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAhsan-Yasin%2Fnew_portfolio&env=ADMIN_PASSWORD&envDescription=The%20password%20for%20the%20admin%20panel.%20At%20least%208%20characters.&stores=%5B%7B%22type%22%3A%22blob%22%2C%22access%22%3A%22private%22%7D%5D)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAhsan-Yasin%2Fnew_portfolio&stores=%5B%7B%22type%22%3A%22blob%22%2C%22access%22%3A%22private%22%7D%5D)
 
 ## Editing the site
 
@@ -56,6 +47,6 @@ Go to `/admin` on your site and sign in. The starting content comes from `src/li
 
 ## Good to know
 
-- To change the admin password, update `ADMIN_PASSWORD` in your Vercel project settings and redeploy. This signs out every existing session.
+- The admin password is set in the code, in `src/lib/auth/token.ts`. To change it, edit that line and push. This signs out every existing session. While this repository is public, anyone who reads that file can sign in.
 - Visitors who have asked their device to reduce motion get a calm, static version of the site automatically.
 - The resume page at `/resume` is generated from your content and prints cleanly as a PDF. You can also upload your own PDF under **Profile**.

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
 import { LoginForm } from '@/components/admin/login-form';
-import { isAuthenticated, passwordStatus } from '@/lib/auth/session';
+import { isAuthenticated } from '@/lib/auth/session';
 import { getPublishedContent } from '@/lib/content/store';
 
 export const metadata: Metadata = { title: 'Sign in' };
@@ -23,7 +23,7 @@ async function LoginGate() {
   await connection();
   if (await isAuthenticated()) redirect('/admin');
 
-  return <LoginForm siteName={await siteName()} status={passwordStatus()} />;
+  return <LoginForm siteName={await siteName()} />;
 }
 
 async function siteName() {

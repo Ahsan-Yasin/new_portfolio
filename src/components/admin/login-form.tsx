@@ -3,41 +3,16 @@
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { useActionState, useState, useSyncExternalStore } from 'react';
 import { loginAction, type LoginState } from '@/app/admin/actions';
-import type { PasswordStatus } from '@/lib/auth/session';
 import { hasRecovery } from './recovery';
 
 const INITIAL: LoginState = {};
 const subscribeNever = () => () => {};
 const readNoRecovery = () => false;
 
-export function LoginForm({ siteName, status }: { siteName: string; status: PasswordStatus }) {
+export function LoginForm({ siteName }: { siteName: string }) {
   const [state, action, pending] = useActionState(loginAction, INITIAL);
   const [visible, setVisible] = useState(false);
   const recovered = useSyncExternalStore(subscribeNever, hasRecovery, readNoRecovery);
-
-  if (status !== 'ok') {
-    return (
-      <div className="a-login-card">
-        <h1 className="a-login-title">{siteName}</h1>
-        <p className="a-login-text">
-          {status === 'missing'
-            ? 'This panel needs a password before anyone can sign in.'
-            : 'The password that’s set is too short. It needs at least 8 characters.'}
-        </p>
-        <ol className="a-login-steps">
-          <li>Open this project on vercel.com, then go to Settings and Environment Variables.</li>
-          <li>
-            Add a variable named <code>ADMIN_PASSWORD</code>, with a password of at least 8 characters as its value.
-          </li>
-          <li>Redeploy from the Deployments tab, then reload this page.</li>
-        </ol>
-        <p className="a-login-text is-small">
-          Running on your own computer? Put <code>ADMIN_PASSWORD=your-password</code> in a file named{' '}
-          <code>.env.local</code> and restart.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <form className="a-login-card" action={action}>

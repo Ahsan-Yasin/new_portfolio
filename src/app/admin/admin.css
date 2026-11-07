@@ -2244,22 +2244,6 @@
     margin-top: 4px;
     color: var(--a-text-2);
     font-size: 14px;
-
-    &.is-small {
-      margin-top: 12px;
-      font-size: 12px;
-    }
-  }
-
-  .a-login-steps {
-    margin-top: 14px;
-    padding-left: 18px;
-    font-size: 14px;
-    list-style: decimal;
-
-    li + li {
-      margin-top: 6px;
-    }
   }
 
   .a-login-note {
