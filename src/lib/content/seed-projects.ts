@@ -9,11 +9,11 @@ export const seedProjects: Project[] = [
     "id": "lensbay",
     "slug": "lensbay",
     "title": "LensBay",
-    "summary": "A live marketplace for used camera gear in Pakistan, with auctions, live messaging, repair listings and a 3D camera that comes apart as you scroll.",
+    "summary": "A live marketplace for used camera gear in Pakistan, with auctions, live messaging, a listing wizard and a 3D camera that comes apart as you scroll.",
     "published": true,
     "cover": {
       "src": "/projects/lensbay-cover.webp",
-      "alt": "LensBay landing page with an exploded 3D camera between the words Camera Gear, Verified, on desktop and phone",
+      "alt": "The LensBay landing page on desktop and phone, with a 3D camera coming apart between the words Camera Gear, Verified",
       "kind": "image",
       "width": 2000,
       "height": 1200
@@ -73,10 +73,10 @@ export const seedProjects: Project[] = [
       {
         "id": "b2",
         "type": "text",
-        "text": "LensBay is my final year project at FAST-NUCES: a marketplace for used camera gear in Pakistan, priced in PKR. People can buy at a fixed price, bid in auctions, message each other live, browse parts and find repair technicians. Payments are simulated for now.\n\nThe idea is that each listing carries evidence about the item: a condition grade, a lens health check, a fair-price range and a seller Trust Score. The AI services behind those are designed but aren’t running live yet, so the site says “Not available right now” instead of showing a made-up result."
+        "text": "LensBay is my final year project at FAST-NUCES: a marketplace for used camera gear in Pakistan, priced in PKR. People can buy at a fixed price, bid in auctions, message each other live, browse parts, find repair technicians and list their own gear through a seven-step wizard. Checkout runs on a simulated gateway, and the listings on the live site today are demo data.\n\nThe website and API are deployed on AWS. The AI services for condition grading, lens health, fair pricing and a shopping assistant are designed but switched off for now, so the site says “Not available right now” instead of showing a fake result."
       },
       {
-        "id": "b3",
+        "id": "walkthrough",
         "type": "media",
         "media": {
           "src": "/projects/lensbay-recording.mp4",
@@ -91,6 +91,20 @@ export const seedProjects: Project[] = [
         "color": "#DDF1EA"
       },
       {
+        "id": "b3",
+        "type": "media",
+        "media": {
+          "src": "/projects/lensbay-1.webp",
+          "alt": "LensBay search page with filters and used camera gear priced in PKR",
+          "kind": "image",
+          "width": 1600,
+          "height": 1000
+        },
+        "caption": "Search with filters for category, brand, price and city. The AI chips say “Not available right now” because those services are off.",
+        "size": "wide",
+        "color": "#DDF1EA"
+      },
+      {
         "id": "b4",
         "type": "heading",
         "text": "How it’s built"
@@ -100,38 +114,39 @@ export const seedProjects: Project[] = [
         "type": "list",
         "title": "",
         "items": [
-          "The landing camera is built in code with React Three Fiber and driven by one pinned GSAP ScrollTrigger timeline. Where the browser supports it, the scene renders on an OffscreenCanvas in a Web Worker.",
-          "The marketplace API is a modular monolith on Express, Mongoose and Socket.IO, with 18 feature modules. A bid in an auction’s last 2 minutes adds 2 more.",
-          "AI sits behind a boundary: four FastAPI services for vision, pricing, the shopping assistant and 3D reconstruction, which only the API calls. The API polls their health, and the site shows each feature only when its service is available.",
-          "It’s deployed on AWS on a t3.small, using Docker and Nginx.",
-          "CI/CD runs on GitHub Actions: each push is checked, and a push to main deploys automatically."
+          "The landing camera is built in code with React Three Fiber, with no 3D model files in the repo. One pinned GSAP timeline drives it, and it renders on an OffscreenCanvas in a Web Worker, with state sent as a Float32Array and a main-thread fallback.",
+          "Rolldown chunk groups keep React out of the Three.js chunk, so index.html preloads no Three.js.",
+          "The API is a modular monolith on Express, Mongoose and Socket.IO. Its 18 feature modules call each other through mod(‘name’), multi-document changes run in MongoDB transactions, and side effects fire after commit.",
+          "A bid only writes if the bid count is unchanged since it was read, and otherwise retries. A bid in an auction’s last 2 minutes adds 2 minutes.",
+          "AI sits behind a boundary: four FastAPI services that only the API calls. A public availability route reports each feature, and all seven are off today.",
+          "CI/CD runs on GitHub Actions: a push to main runs CI and deploys to AWS on a t3.small, using Docker and Nginx."
         ]
       },
       {
         "id": "b6",
         "type": "media",
         "media": {
-          "src": "/projects/lensbay-1.webp",
-          "alt": "A LensBay listing for a Fujifilm X-T3 with photos, an asking price in PKR and buy buttons",
+          "src": "/projects/lensbay-3.webp",
+          "alt": "A LensBay auction for a Canon EOS 6D just after a bid, with toasts saying the bid was placed and the auction extended",
           "kind": "image",
           "width": 1600,
           "height": 1000
         },
-        "caption": "A listing page with photos, price and checkout. The AI chips say Not available right now until those services are connected.",
-        "size": "wide",
+        "caption": "A local test on demo data: a bid in the last 2 minutes adds 2 minutes.",
+        "size": "inset",
         "color": "#DDF1EA"
       },
       {
         "id": "b7",
         "type": "media",
         "media": {
-          "src": "/projects/lensbay-3.webp",
-          "alt": "A live auction page for a Nikon D7500 with its price, time left and bid controls",
+          "src": "/projects/lensbay-4.webp",
+          "alt": "A LensBay conversation about a tripod, with the seller’s reply in the thread",
           "kind": "image",
           "width": 1600,
           "height": 1000
         },
-        "caption": "Auctions update live, and a bid in the last 2 minutes adds 2 more.",
+        "caption": "Live messaging between demo accounts. The reply appears without a reload.",
         "size": "inset",
         "color": "#DDF1EA"
       },
@@ -140,12 +155,26 @@ export const seedProjects: Project[] = [
         "type": "media",
         "media": {
           "src": "/projects/lensbay-2.webp",
-          "alt": "Landing page section explaining the find, check, verify and buy steps beside the 3D camera",
+          "alt": "A LensBay listing for a Canon EF 70-200mm lens with photos, an asking price in PKR and buy buttons",
           "kind": "image",
           "width": 1600,
           "height": 1000
         },
-        "caption": "The landing page, where scrolling moves, rotates and opens the 3D camera section by section. The 94/100 trust score is sample copy, and the checks it lists need AI services that aren’t live yet.",
+        "caption": "A listing page with photos, price and checkout, on demo data.",
+        "size": "inset",
+        "color": "#DDF1EA"
+      },
+      {
+        "id": "b9",
+        "type": "media",
+        "media": {
+          "src": "/projects/lensbay-5.webp",
+          "alt": "Step 2 of the LensBay listing wizard with four lens photos added",
+          "kind": "image",
+          "width": 1600,
+          "height": 1000
+        },
+        "caption": "Step 2 of the seven-step listing wizard. The API checks each photo’s size, sharpness and brightness.",
         "size": "inset",
         "color": "#DDF1EA"
       }
@@ -155,7 +184,7 @@ export const seedProjects: Project[] = [
     "id": "highlight-cutter",
     "slug": "highlight-cutter",
     "title": "Highlight Cutter",
-    "summary": "Turns a raw meeting recording into a finished video, vertical shorts, a video of everything it cut and a report of why. It’s deployed and in use at FloLabs.",
+    "summary": "Turns FloLabs’ Zoom recordings into an edited video with a highlights reel, vertical shorts and a report, then posts the video and shorts to the company YouTube channel by itself.",
     "published": true,
     "cover": {
       "src": "/projects/highlight-cutter-cover.webp",
@@ -182,13 +211,31 @@ export const seedProjects: Project[] = [
       "ffmpeg",
       "LLM",
       "Zoom API",
-      "YouTube API"
+      "YouTube Data API",
+      "Docker",
+      "AWS",
+      "GitHub Actions"
     ],
     "metrics": [
       {
         "id": "m1",
         "value": "In use",
         "label": "Deployed at FloLabs"
+      },
+      {
+        "id": "m2",
+        "value": "157,890",
+        "label": "Frames rendered on a real 98-minute meeting, exactly as many as the edit list expected"
+      },
+      {
+        "id": "m3",
+        "value": "191k → 64k",
+        "label": "Tokens to judge that meeting after replacing JSON answers with a compact format"
+      },
+      {
+        "id": "m4",
+        "value": "1,103",
+        "label": "Tests passing, including real renders on the pinned ffmpeg build"
       }
     ],
     "links": [],
@@ -201,19 +248,33 @@ export const seedProjects: Project[] = [
       {
         "id": "b2",
         "type": "text",
-        "text": "Highlight Cutter takes a Zoom recording, a YouTube link or an uploaded file and produces one zip per meeting: the final video with the highlights reel first and the cleaned meeting after it, vertical shorts with burned-in captions, a video of every cut labelled with its time and reason, a PDF report, transcripts and YouTube chapters.\n\nIt reuses the platform’s own transcript when there is one, an AI pass judges every sentence, and ffmpeg does the cutting. It’s deployed and in use at FloLabs, where I work as an Intern and Co-Team Lead. The screenshots here show a synthetic demo meeting with fictional people, not a real recording."
+        "text": "Highlight Cutter takes a Zoom recording and produces one zip per meeting: a final video that opens with a highlights reel and continues with the cleaned meeting, vertical shorts with burned-in captions, a video of what was removed with each cut labelled by time and reason, a PDF report, transcripts and YouTube chapters. An LLM judges every sentence, and plain code and ffmpeg do the cutting. It’s deployed and in use at FloLabs.\n\nAn autopilot watches the team’s Zoom account, processes each new recording one at a time, and posts the shorts and then the full video to the company channel, built never to post one twice. A never-post list keeps internal meetings off the channel. Real meetings stay private, so everything shown here comes from a run on a synthetic meeting with fictional people and text-to-speech voices."
+      },
+      {
+        "id": "demo",
+        "type": "media",
+        "media": {
+          "src": "/projects/highlight-cutter-demo.mp4",
+          "alt": "The real app processing a synthetic meeting from upload to finished results",
+          "kind": "video",
+          "width": 1440,
+          "height": 900
+        },
+        "caption": "The real app on a synthetic meeting. Autopilot and uploads were off for this run, so nothing was posted, and the waits are shortened.",
+        "size": "wide",
+        "color": "#FBE6E2"
       },
       {
         "id": "b3",
         "type": "media",
         "media": {
           "src": "/projects/highlight-cutter-1.webp",
-          "alt": "A finished job for a synthetic demo meeting, with every stage ticked and a table of what the AI picked",
+          "alt": "Job page with every pipeline stage ticked off and a table of the moments the AI ranked for the reel and shorts",
           "kind": "image",
           "width": 1600,
           "height": 1000
         },
-        "caption": "A finished job on a synthetic demo meeting: every stage ticked, the uploaded transcript reused, and what the AI picked for the reel and shorts.",
+        "caption": "A finished job: every stage ticked off, and the moments the AI ranked for the reel and shorts. This is a synthetic meeting.",
         "size": "wide",
         "color": "#FBE6E2"
       },
@@ -227,11 +288,12 @@ export const seedProjects: Project[] = [
         "type": "list",
         "title": "",
         "items": [
-          "A FastAPI service with a single-worker job queue. Each job moves through ingest, transcription, the AI decisions, the edit list, then rendering and packaging.",
-          "The AI judges each sentence keep or remove and scores highlights, then re-ranks the best moments and writes the chapters. Claude Haiku is the default, with OpenAI and Gemini as options.",
-          "Every cut lands on a whole source frame, and every piece is checked for frame count and encoder settings before it’s joined, so a mismatch fails the job instead of shipping a broken file.",
-          "Silence detection measures the audio itself and adapts to each recording, so a quiet speaker isn’t cut.",
-          "It can publish to YouTube: the shorts first, then the full video with chapters and links to them, and a published video is never uploaded twice."
+          "Frame-exact renderer: every cut sits on the source frame grid, and each piece is encoded once with a pinned libx264 profile. That removed a 78-second timeline drift on a real 98-minute meeting, and a regression gate checks the result: 157,890 frames rendered, exactly as many as expected.",
+          "Compact AI protocol: sentences go in as numbered lines and one short line comes back for each. Compared with the first JSON version on that meeting, judging went from 38 calls and 191k tokens to 23 calls and 64k. One setting switches between Claude, OpenAI and Gemini.",
+          "Adaptive silence detection: the source audio is measured in 50 ms windows, and the threshold is worked out per recording from room tone and speech level, so a quiet talker isn’t cut.",
+          "Autopilot and upload ledger: new recordings are found through Zoom’s webhook, its meeting schedule and a 30-minute check. Every upload is logged before its first byte, so a crash resumes the same upload instead of posting twice.",
+          "Built for a small server: FastAPI with a single-worker queue, job state as JSON files, disk checks, automatic cleanup of old jobs, and limits on recording and job length.",
+          "CI on GitHub Actions: lint and 1,103 tests, including real renders on a pinned ffmpeg 9.0.1, then deploy on main. Teammates built the first version, the first AWS deployment and the first YouTube publishing. I’ve driven the work since, with 25 of the 28 commits on main since October 25."
         ]
       },
       {
@@ -239,12 +301,12 @@ export const seedProjects: Project[] = [
         "type": "media",
         "media": {
           "src": "/projects/highlight-cutter-2.webp",
-          "alt": "A clip labelled Removed 00:00 to 01:34, housekeeping, above two vertical shorts with captions",
+          "alt": "The removed-parts video labelled with its original time and the reason housekeeping, above two vertical shorts with burned-in captions",
           "kind": "image",
           "width": 1600,
           "height": 1000
         },
-        "caption": "Every cut of a second or more is in its own video, labelled with its time and reason, and the shorts come ready to post.",
+        "caption": "Cuts of a second or more go into their own video, labelled with original time and reason, above the vertical shorts. This is a synthetic meeting.",
         "size": "inset",
         "color": "#FBE6E2"
       },
@@ -253,12 +315,12 @@ export const seedProjects: Project[] = [
         "type": "media",
         "media": {
           "src": "/projects/highlight-cutter-3.webp",
-          "alt": "The PDF report, listing highlights, shorts, YouTube chapters and removed parts with reasons",
+          "alt": "PDF report page listing the highlights reel, shorts, YouTube chapters and removed parts",
           "kind": "image",
           "width": 1600,
           "height": 1000
         },
-        "caption": "The PDF report: highlights, shorts, chapters and every removal with its reason.",
+        "caption": "The PDF report from the same run: reel, shorts, chapters and every cut with its reason.",
         "size": "inset",
         "color": "#FBE6E2"
       }

@@ -153,7 +153,7 @@ export const seedContent: Content = {
       end: 'Present',
       location: '',
       summary:
-        'Built Highlight Cutter, a Python tool that edits Zoom meeting recordings into clean videos and shorts, now deployed and in use at FloLabs. I co-lead the team with another lead, coordinating tasks and tracking progress.',
+        'Develop Highlight Cutter, a Python tool that edits Zoom meeting recordings into clean videos and shorts, now deployed and in use at FloLabs. I co-lead the team with another lead, coordinating tasks and tracking progress.',
       url: '',
     },
   ],
