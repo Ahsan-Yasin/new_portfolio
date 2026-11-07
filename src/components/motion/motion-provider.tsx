@@ -37,14 +37,37 @@ export function MotionProvider({ level, children }: { level: Theme['motion']; ch
     };
   }, [level]);
 
+  // Browser Back and Forward should return to where the visitor was, not to the top.
+  const cameFromHistory = useRef(false);
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      lenisRef.current?.scrollTo(hash, { immediate: true, offset: -72 });
-    } else {
-      lenisRef.current?.scrollTo(0, { immediate: true });
+    const onPopState = () => {
+      cameFromHistory.current = true;
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  useEffect(() => {
+    const fromHistory = cameFromHistory.current;
+    cameFromHistory.current = false;
+
+    if (!fromHistory) {
+      const hash = window.location.hash;
+      if (hash) {
+        lenisRef.current?.scrollTo(hash, { immediate: true, force: true, offset: -72 });
+      } else {
+        // Moves the page natively too: Lenis skips a scroll to where it believes it already is,
+        // and that belief can be out of date after the browser restores a position.
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+      }
     }
-    const id = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+
+    const id = window.setTimeout(() => {
+      // After Back or Forward, tell Lenis where the browser put the page, so the next wheel tick doesn't jump.
+      if (fromHistory) lenisRef.current?.scrollTo(window.scrollY, { immediate: true, force: true });
+      ScrollTrigger.refresh();
+    }, 120);
     return () => window.clearTimeout(id);
   }, [pathname]);
 

@@ -74,11 +74,11 @@ export function IntroScene({ content, section }: { content: Content; section: Se
             className="intro-card relative mx-auto aspect-[4/5] w-[min(68vw,300px)] will-change-transform lg:w-[clamp(240px,25vw,400px)]"
             style={{ transformStyle: 'preserve-3d' }}
           >
-            <div className="flip-face overflow-hidden rounded-[clamp(14px,1.6vw,26px)] bg-[#111] shadow-[0_40px_100px_rgba(0,0,0,.34)]">
-              <Media media={portrait} fill sizes="(max-width: 900px) 68vw, 400px" />
+            <div className="flip-face overflow-hidden rounded-[clamp(14px,1.6vw,26px)] bg-accent shadow-[0_40px_100px_rgba(0,0,0,.34)]">
+              <Media media={portrait} fill position="center top" sizes="(max-width: 900px) 68vw, 400px" />
               <span aria-hidden className="intro-shine absolute inset-0 bg-[linear-gradient(105deg,transparent_35%,rgba(255,255,255,.5)_50%,transparent_65%)] opacity-0" />
             </div>
-            <div aria-hidden className="flip-face flip-back grid place-items-center overflow-hidden rounded-[clamp(14px,1.6vw,26px)] bg-accent text-on-accent shadow-[0_40px_100px_rgba(0,0,0,.34)]">
+            <div aria-hidden className="flip-face flip-back grid place-items-center overflow-hidden rounded-[clamp(14px,1.6vw,26px)] bg-[#111] text-accent shadow-[0_40px_100px_rgba(0,0,0,.34)]">
               <svg viewBox="0 0 48 48" className="w-[38%]" fill="currentColor">
                 <path d="M24 0c1.7 13.6 8.4 20.3 24 24-15.6 3.7-22.3 10.4-24 24-1.7-13.6-8.4-20.3-24-24C15.6 20.3 22.3 13.6 24 0Z" />
               </svg>

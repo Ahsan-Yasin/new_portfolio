@@ -25,20 +25,13 @@ async function readPublished(): Promise<Content> {
 export async function getPublishedContent(): Promise<Content> {
   'use cache';
   cacheTag(CONTENT_TAG);
+  // Publishing expires this immediately. The timed refresh is a safety net: if an
+  // expiry ever fails to reach a server, pages still catch up within a few minutes.
+  cacheLife({ stale: 300, revalidate: 300, expire: 60 * 60 * 24 * 7 });
 
-  try {
-    const content = await readPublished();
-    cacheLife('max');
-    return content;
-  } catch (error) {
-    // A storage failure during a build shouldn't fail the deploy, so build with
-    // the sample content and re-read shortly afterwards. At runtime, let the error
-    // boundary handle it instead of showing a visitor sample content.
-    if (process.env.NEXT_PHASE !== 'phase-production-build') throw error;
-    console.error('Could not read content during the build:', error);
-    cacheLife({ stale: 0, revalidate: 1, expire: 60 });
-    return parseContent(seedContent);
-  }
+  // If storage can't be read during a build, the build fails and the previous
+  // deployment stays live, which is better than publishing the starting content.
+  return readPublished();
 }
 
 export type DraftDocument = {
@@ -68,11 +61,15 @@ export async function publishContent(content: Content, etag: string | null) {
   const saved = await writeJson(DRAFT_KEY, live, { ifMatch: etag });
   await writeJson(PUBLISHED_KEY, live);
 
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  await writeJson(`${HISTORY_PREFIX}${stamp}.json`, live);
-
-  const versions = await listFiles(HISTORY_PREFIX);
-  await Promise.all(versions.slice(HISTORY_LIMIT).map((file) => removeFile(file.key)));
+  // The site is live at this point, so a problem keeping the backup copy mustn't fail the publish.
+  try {
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    await writeJson(`${HISTORY_PREFIX}${stamp}.json`, live);
+    const versions = await listFiles(HISTORY_PREFIX);
+    await Promise.all(versions.slice(HISTORY_LIMIT).map((file) => removeFile(file.key)));
+  } catch (error) {
+    console.error('Published, but could not update version history:', error);
+  }
 
   return { etag: saved.etag, content: live };
 }

@@ -56,7 +56,14 @@ export function readableOn(hex: string) {
 
 export function resolveSiteUrl(content: Content) {
   const configured = content.site.url.trim().replace(/\/$/, '');
-  if (/^https?:\/\//.test(configured)) return configured;
+  if (/^https?:\/\//.test(configured)) {
+    try {
+      // A mistyped address must never take the pages down with it.
+      return new URL(configured).origin;
+    } catch {
+      // Falls through to the deployment's own address.
+    }
+  }
   const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   return vercel ? `https://${vercel}` : 'http://localhost:3000';
 }

@@ -49,8 +49,8 @@ export async function endSession() {
 
 /**
  * Slows repeated guesses. Serverless instances don't share memory, so this limits
- * each instance rather than the whole deployment; the enforced minimum password
- * length is what actually keeps guessing impractical.
+ * each instance rather than the whole deployment. It can't protect a password that's
+ * easy to guess, so a long, unusual one is still the real defence.
  */
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000;

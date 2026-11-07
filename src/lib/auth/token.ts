@@ -2,7 +2,7 @@ import { jwtVerify, SignJWT } from 'jose';
 
 export const SESSION_COOKIE = 'admin_session';
 export const SESSION_DAYS = 7;
-export const MIN_PASSWORD_LENGTH = 12;
+export const MIN_PASSWORD_LENGTH = 8;
 
 const encoder = new TextEncoder();
 

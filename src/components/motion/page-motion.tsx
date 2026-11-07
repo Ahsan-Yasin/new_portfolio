@@ -5,12 +5,16 @@ import { FULL_MOTION, gsap, ScrollTrigger, SplitText, useGSAP } from './gsap';
 import { useMotionLevel } from './motion-provider';
 
 const HIDDEN_UNTIL_ANIMATED = '[data-lines],[data-fade],[data-stagger],[data-media],[data-load]';
-const NUMBER = /^([^\d]*)(\d[\d,]*\.?\d*)(.{0,3})$/;
+// Only plain figures run up, like "+9.68", "$40k" or "83%". Anything with words, like "Live 3D", stays as written.
+const NUMBER = /^([+\-−–$£€~≈<>]?\s?)(\d[\d,]*\.?\d*)(%|\+|x|×|k|K|m|M|h|s)?$/;
 
 function animateCount(element: HTMLElement) {
-  const match = NUMBER.exec(element.textContent?.trim() ?? '');
+  // Effects can run more than once, so always start from the real value rather than whatever's on screen.
+  const real = element.dataset.countValue ?? element.textContent?.trim() ?? '';
+  element.dataset.countValue = real;
+  const match = NUMBER.exec(real);
   if (!match) return;
-  const [, prefix, digits, suffix] = match;
+  const [, prefix, digits, suffix = ''] = match;
   const target = Number(digits.replace(/,/g, ''));
   const decimals = digits.includes('.') ? digits.split('.')[1].length : 0;
   const grouped = digits.includes(',');

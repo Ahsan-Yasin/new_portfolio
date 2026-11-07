@@ -164,6 +164,7 @@ export const educationSchema = z.object({
   school: text(),
   degree: text(),
   year: text(),
+  summary: text(),
 });
 
 export const sectionIds = [

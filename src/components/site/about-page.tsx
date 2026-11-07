@@ -1,90 +1,183 @@
+import { CaseCards } from '@/components/motion/case-cards';
+import { CasePortrait } from '@/components/motion/case-portrait';
+import { CasePrinciples } from '@/components/motion/case-principles';
+import { CaseWords } from '@/components/motion/case-words';
+import { PageMotion } from '@/components/motion/page-motion';
 import { safeHref, type Content } from '@/lib/content/schema';
-import { Media } from './media';
+import { initials } from '@/lib/content/select';
 import { ContactBand } from './home-page';
+import { Media } from './media';
 import { RichText, ToneText } from './rich-text';
+import './inner-pages.css';
+
+const NUMERAL_FILTER = 'principles-melt';
+const counter = (value: number) => String(value + 1).padStart(2, '0');
+
+/** Falls back to the profile photo, and then to a black card with initials, so the page always keeps its centrepiece. */
+function PortraitCard({ content }: { content: Content }) {
+  const { about, profile } = content;
+  const media = about.portrait.src ? about.portrait : profile.avatar;
+  return (
+    <div className="about-perspective">
+      <div className="about-card">
+        {media.src ? (
+          <div data-parallax="6" className="about-card-picture">
+            <Media media={media} fill position="center top" sizes="(max-width: 900px) 82vw, 520px" priority />
+          </div>
+        ) : (
+          <div aria-hidden className="about-card-blank">
+            <span className="t-small">{profile.role}</span>
+            <span className="about-card-initials">{initials(profile.name)}</span>
+          </div>
+        )}
+        <span aria-hidden className="about-card-shine" />
+      </div>
+    </div>
+  );
+}
+
+function Principles({ content }: { content: Content }) {
+  const { about } = content;
+  if (about.principles.length === 0) return null;
+  return (
+    <CasePrinciples filterId={NUMERAL_FILTER} className="principles on-inverse">
+      <div className="wrap">
+        {about.principlesTitle ? (
+          <h2 data-lines className="t-hero max-w-[14em]">
+            {about.principlesTitle}
+          </h2>
+        ) : null}
+        <div className="principles-grid">
+          <div aria-hidden className="principles-pin">
+            <svg width="0" height="0" className="absolute">
+              <defs>
+                <filter id={NUMERAL_FILTER}>
+                  <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 255 -140" />
+                </filter>
+              </defs>
+            </svg>
+            <div className="principles-stack">
+              {about.principles.map((principle, index) => (
+                <span key={principle.id} className="principles-num">
+                  {counter(index)}
+                </span>
+              ))}
+            </div>
+          </div>
+          <ol className="principles-list">
+            {about.principles.map((principle, index) => (
+              <li key={principle.id} className="principle">
+                <span aria-hidden data-rule className="case-rule absolute inset-x-0 top-0" />
+                <span aria-hidden className="principle-index">
+                  {counter(index)}
+                </span>
+                <div>
+                  <h3 data-lines className="t-title">
+                    {principle.title}
+                  </h3>
+                  {principle.text ? (
+                    <p data-fade className="t-lead mt-[clamp(12px,1.4vw,20px)] max-w-[30em] text-on-inverse-2">
+                      {principle.text}
+                    </p>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </CasePrinciples>
+  );
+}
+
+function Awards({ content }: { content: Content }) {
+  const { about } = content;
+  if (about.awards.length === 0) return null;
+  return (
+    <section className="about-awards">
+      <div className="wrap">
+        {about.awardsTitle ? (
+          <h2 data-lines className="t-hero mb-[clamp(32px,4.5vw,64px)]">
+            {about.awardsTitle}
+          </h2>
+        ) : null}
+        <CaseCards className="grid gap-[clamp(12px,1.4vw,20px)] sm:grid-cols-2 lg:grid-cols-3">
+          {about.awards.map((award) => {
+            const href = safeHref(award.url);
+            const inner = (
+              <>
+                <span className="award-year">{award.year}</span>
+                <span>
+                  <span className="t-card block">{award.title}</span>
+                  {award.issuer ? <span className="t-small mt-1.5 block text-[#a8a498]">{award.issuer}</span> : null}
+                </span>
+              </>
+            );
+            return (
+              <div key={award.id} className="award-slot">
+                {href ? (
+                  <a href={href} target="_blank" rel="noreferrer" className="award-card">
+                    {inner}
+                  </a>
+                ) : (
+                  <div className="award-card">{inner}</div>
+                )}
+              </div>
+            );
+          })}
+        </CaseCards>
+      </div>
+    </section>
+  );
+}
 
 export function AboutPage({ content }: { content: Content }) {
   const { about } = content;
   return (
     <>
-      <section className="sheet-hero">
-        <div className="wrap pb-[clamp(56px,7vw,104px)] pt-[clamp(128px,18vh,180px)]">
-          <h1 className="t-display max-w-[16em]">
-            <ToneText text={about.headline} />
-          </h1>
-          <div className="grid-12 mt-[clamp(40px,5vw,72px)] gap-y-10">
-            {about.portrait.src ? (
-              <div className="relative col-span-12 aspect-[4/5] overflow-hidden rounded-large bg-well md:col-span-4">
-                <Media media={about.portrait} fill sizes="(max-width: 768px) 92vw, 440px" priority />
-              </div>
-            ) : null}
-            <div className={`col-span-12 ${about.portrait.src ? 'md:col-span-7 md:col-start-6' : 'md:col-span-7 md:col-start-5'}`}>
-              {about.intro ? <p className="t-subtitle text-balance">{about.intro}</p> : null}
-              {about.body ? <RichText text={about.body} className="muted mt-6" /> : null}
-              {about.facts.length ? (
-                <dl className="mt-10 grid grid-cols-2 gap-x-[clamp(12px,1.6vw,24px)] gap-y-5 lg:grid-cols-3">
-                  {about.facts.map((fact) => (
-                    <div key={fact.id} className="border-t border-line pt-3">
-                      <dt className="t-micro text-ink-3">{fact.label}</dt>
-                      <dd className="t-small mt-1 text-pretty">{fact.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : null}
-            </div>
-          </div>
-        </div>
+      <PageMotion />
+
+      <section className="about-open wrap">
+        <h1 data-lines="load" className="t-closing">
+          <ToneText text={about.headline} />
+        </h1>
       </section>
 
-      {about.principles.length ? (
-        <section className="section">
-          <div className="wrap grid-12 gap-y-8">
-            <h2 className="t-title col-span-12 md:col-span-4">{about.principlesTitle}</h2>
-            <ol className="col-span-12 md:col-span-7 md:col-start-6">
-              {about.principles.map((principle) => (
-                <li key={principle.id} className="border-t border-line py-[clamp(18px,2vw,26px)]">
-                  <h3 className="t-card">{principle.title}</h3>
-                  <p className="muted mt-2 text-pretty">{principle.text}</p>
-                </li>
+      <CasePortrait className="about-story wrap grid-12">
+        <div className="about-portrait-col">
+          <PortraitCard content={content} />
+        </div>
+        <div className="about-text-col">
+          {about.intro ? (
+            <CaseWords className="case-lead">
+              <p>{about.intro}</p>
+            </CaseWords>
+          ) : null}
+          {about.body ? (
+            <CaseWords className="mt-[clamp(32px,4vw,64px)]">
+              <RichText text={about.body} className="about-body" />
+            </CaseWords>
+          ) : null}
+          {about.facts.length ? (
+            <dl className="mt-[clamp(48px,6vw,88px)] grid grid-cols-2 gap-x-[clamp(12px,1.6vw,24px)] gap-y-6 lg:grid-cols-3">
+              {about.facts.map((fact) => (
+                <div key={fact.id} className="relative pt-3.5">
+                  <dt className="t-micro text-ink-3">
+                    <span aria-hidden data-rule className="case-rule absolute inset-x-0 top-0" />
+                    {fact.label}
+                  </dt>
+                  <dd data-fade className="t-lead mt-1.5 text-pretty">
+                    {fact.value}
+                  </dd>
+                </div>
               ))}
-            </ol>
-          </div>
-        </section>
-      ) : null}
+            </dl>
+          ) : null}
+        </div>
+      </CasePortrait>
 
-      {about.awards.length ? (
-        <section className="section-tight">
-          <div className="wrap grid-12 gap-y-6">
-            <h2 className="t-subtitle col-span-12 md:col-span-4">{about.awardsTitle}</h2>
-            <ul className="col-span-12 md:col-span-7 md:col-start-6">
-              {about.awards.map((award) => {
-                const href = safeHref(award.url);
-                const inner = (
-                  <>
-                    <span className="min-w-0 flex-1">
-                      <span className="font-medium">{award.title}</span>
-                      {award.issuer ? <span className="muted block">{award.issuer}</span> : null}
-                    </span>
-                    <span className="t-small flex-none tabular-nums text-ink-3">{award.year}</span>
-                  </>
-                );
-                return (
-                  <li key={award.id} className="border-t border-line">
-                    {href ? (
-                      <a href={href} target="_blank" rel="noreferrer" className="flex justify-between gap-6 py-4 hover:opacity-70">
-                        {inner}
-                      </a>
-                    ) : (
-                      <div className="flex justify-between gap-6 py-4">{inner}</div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </section>
-      ) : null}
-
+      <Principles content={content} />
+      <Awards content={content} />
       <ContactBand content={content} />
     </>
   );

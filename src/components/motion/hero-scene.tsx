@@ -109,8 +109,12 @@ export function HeroScene({ content }: { content: Content }) {
       };
       const radiusFor = () => (small ? window.innerWidth * 0.58 : Math.min(window.innerWidth * 0.38, 580));
 
+      // The nav lives outside this section, so it can't be found through the scoped selector.
+      const navPill = document.querySelector('.site-nav-pill');
+
       const showStill = () => {
-        gsap.set('[data-intro], .hero-star, .hero-bolt, .site-nav-pill', { autoAlpha: 1 });
+        gsap.set('[data-intro], .hero-star, .hero-bolt', { autoAlpha: 1 });
+        if (navPill) gsap.set(navPill, { autoAlpha: 1 });
         gsap.set('.hero-bolt', { rotate: 16 });
         placeCards(radiusFor());
         if (ring) gsap.set(ring, { rotateX: tilt, rotateZ: -5 });
@@ -118,7 +122,7 @@ export function HeroScene({ content }: { content: Content }) {
 
       if (level !== 'full') {
         showStill();
-        return;
+        return () => window.removeEventListener('resize', fitTitle);
       }
 
       media.add('(prefers-reduced-motion: reduce)', showStill);
@@ -141,12 +145,14 @@ export function HeroScene({ content }: { content: Content }) {
           { autoAlpha: 1, filter: 'blur(0px)', yPercent: 0, duration: 1.6, ease: 'expo.out', clearProps: 'filter' },
           0.8,
         );
-        timeline.fromTo(
-          '.site-nav-pill',
-          { autoAlpha: 0, y: -18, scale: 0.92 },
-          { autoAlpha: 1, y: 0, scale: 1, duration: 1.2, ease: 'expo.out' },
-          1.25,
-        );
+        if (navPill) {
+          timeline.fromTo(
+            navPill,
+            { autoAlpha: 0, y: -18, scale: 0.92 },
+            { autoAlpha: 1, y: 0, scale: 1, duration: 1.2, ease: 'expo.out' },
+            1.25,
+          );
+        }
         timeline.fromTo('.hero-star', { autoAlpha: 0, scale: 0, rotate: -140 }, { autoAlpha: 1, scale: 1, rotate: 0, duration: 1.3, ease: 'back.out(2.4)' }, 1.4);
         timeline.fromTo('.hero-bolt', { autoAlpha: 0, scale: 0, rotate: -50 }, { autoAlpha: 1, scale: 1, rotate: 16, duration: 1.3, ease: 'back.out(2.4)' }, 1.5);
         timeline.fromTo('.hero-label', { autoAlpha: 0, y: 14, filter: 'blur(8px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.1, stagger: 0.09, clearProps: 'filter' }, 1.55);
@@ -288,13 +294,15 @@ export function HeroScene({ content }: { content: Content }) {
 
       <div
         data-intro
-        className="hero-portrait absolute bottom-0 left-1/2 z-10 w-[clamp(132px,17vw,280px)] -translate-x-1/2 overflow-hidden rounded-t-[clamp(12px,1.4vw,22px)]"
-        style={{ aspectRatio: '5 / 6', background: '#111' }}
+        className="hero-portrait absolute bottom-0 left-1/2 z-10 h-[min(62svh,46vw+160px)] w-[min(92vw,calc(min(62svh,46vw+160px)*0.8))] -translate-x-1/2"
       >
         {profile.avatar.src ? (
-          <Media media={profile.avatar} fill sizes="280px" priority />
+          // Sits on the bottom edge. A cut-out photo stands in front of the title; a regular photo works too.
+          <Media media={profile.avatar} fill fit="contain" position="center top" sizes="(max-width: 900px) 92vw, 620px" priority />
         ) : (
-          <span className="t-hero absolute inset-0 grid place-items-center text-white">{initials(profile.name)}</span>
+          <span className="t-hero absolute inset-x-0 bottom-0 grid aspect-square place-items-center rounded-t-[22px] bg-[#111] text-white">
+            {initials(profile.name)}
+          </span>
         )}
       </div>
 

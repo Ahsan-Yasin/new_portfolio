@@ -22,12 +22,12 @@ export function LoginForm({ siteName, status }: { siteName: string; status: Pass
         <p className="a-login-text">
           {status === 'missing'
             ? 'This panel needs a password before anyone can sign in.'
-            : 'The password that’s set is too short. It needs at least 12 characters.'}
+            : 'The password that’s set is too short. It needs at least 8 characters.'}
         </p>
         <ol className="a-login-steps">
           <li>Open this project on vercel.com, then go to Settings and Environment Variables.</li>
           <li>
-            Add a variable named <code>ADMIN_PASSWORD</code>, with a password of at least 12 characters as its value.
+            Add a variable named <code>ADMIN_PASSWORD</code>, with a password of at least 8 characters as its value.
           </li>
           <li>Redeploy from the Deployments tab, then reload this page.</li>
         </ol>

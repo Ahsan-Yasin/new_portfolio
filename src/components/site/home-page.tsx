@@ -8,7 +8,7 @@ import { SkillsTrack } from '@/components/motion/skills-track';
 import { TechMarquee } from '@/components/motion/tech-marquee';
 import { TimelineScene } from '@/components/motion/timeline-scene';
 import { WorkDeck } from '@/components/motion/work-deck';
-import { safeHref, type Content, type Section } from '@/lib/content/schema';
+import { safeHref, type Content, type Experience, type Section } from '@/lib/content/schema';
 import { formatPostDate, publishedPosts, publishedProjects, visibleSections } from '@/lib/content/select';
 import { PostList } from './post-list';
 import { SiteLink } from './site-link';
@@ -58,6 +58,26 @@ function Writing({ content, section }: { content: Content; section: Section }) {
   );
 }
 
+/** Jobs followed by education, in one line of history. */
+function careerTimeline(content: Content): Experience[] {
+  return [
+    ...content.experience,
+    ...content.about.education.map((item) => {
+      const [start = '', end = ''] = item.year.split(/\s*[–-]\s*/);
+      return {
+        id: item.id,
+        company: item.school,
+        role: item.degree,
+        start,
+        end,
+        location: '',
+        summary: item.summary,
+        url: '',
+      };
+    }),
+  ];
+}
+
 /** Used to close other pages too, so every journey ends in the same place. */
 export function ContactBand({ content }: { content: Content }) {
   return <ContactScene content={content} />;
@@ -80,11 +100,11 @@ export function HomePage({ content }: { content: Content }) {
             return (
               <div key={section.id}>
                 <SkillsTrack section={section} skills={content.skills} />
-                <TechMarquee items={content.skills.flatMap((group) => group.items)} />
+                <TechMarquee items={[...new Set(content.skills.flatMap((group) => group.items))]} />
               </div>
             );
           case 'experience':
-            return <TimelineScene key={section.id} section={section} experience={content.experience} />;
+            return <TimelineScene key={section.id} section={section} experience={careerTimeline(content)} />;
           case 'testimonials':
             return <FlipQuotes key={section.id} section={section} testimonials={content.testimonials} />;
           case 'writing':

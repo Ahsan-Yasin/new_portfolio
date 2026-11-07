@@ -184,8 +184,10 @@ async function sendToBlob(file: File, onProgress: (fraction: number) => void) {
       onUploadProgress: ({ percentage }) => onProgress(percentage / 100),
     });
     return { src: `/${result.pathname}`, size: file.size };
-  } catch (error) {
-    if (/signed in/i.test(String((error as Error).message))) throw new SessionExpiredError();
+  } catch {
+    // The SDK hides the server's reason, so ask directly: this route answers 401 when signed out.
+    const check = await fetch('/api/admin/upload', { method: 'POST', body: new FormData() }).catch(() => null);
+    if (check?.status === 401) throw new SessionExpiredError();
     throw new Error('The upload didn’t finish. Check your connection and try again.');
   }
 }

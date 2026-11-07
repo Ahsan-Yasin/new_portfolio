@@ -61,7 +61,7 @@ export function TimelineScene({ section, experience }: { section: Section; exper
               return (
                 <li key={job.id} className="tl-row grid gap-x-[clamp(32px,5vw,80px)] gap-y-2 pl-9 md:grid-cols-2 md:pl-0">
                   <div className="md:pr-[clamp(32px,5vw,80px)] md:text-right">
-                    <p className="t-figure tabular-nums">{job.start}</p>
+                    {job.start ? <p className="t-figure tabular-nums">{job.start}</p> : null}
                     <p className="t-card mt-2">{job.role}</p>
                     <p className="text-on-inverse-2">
                       {href ? (
@@ -74,8 +74,10 @@ export function TimelineScene({ section, experience }: { section: Section; exper
                     </p>
                   </div>
                   <div className="md:pl-[clamp(32px,5vw,80px)] md:pt-3">
-                    <p className="t-small text-on-inverse-2 tabular-nums">{[job.start, job.end].filter(Boolean).join(' – ')}</p>
-                    <p className="t-lead mt-2 max-w-[28em] text-on-inverse-2">{job.summary}</p>
+                    {job.start || job.end ? (
+                      <p className="t-small text-on-inverse-2 tabular-nums">{[job.start, job.end].filter(Boolean).join(' – ')}</p>
+                    ) : null}
+                    {job.summary ? <p className="t-lead mt-2 max-w-[28em] text-on-inverse-2">{job.summary}</p> : null}
                   </div>
                 </li>
               );

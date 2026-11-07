@@ -42,6 +42,7 @@ function EducationFields({ cursor, isNew }: { cursor: Cursor<Education>; isNew: 
       <MiniField label="School" autoFocus={isNew} {...field('school')} />
       <MiniField label="Degree" {...field('degree')} />
       <MiniField label="Year" {...field('year')} />
+      <MiniField label="Details" {...field('summary')} />
     </>
   );
 }
@@ -107,7 +108,7 @@ export function AboutSection() {
           cursor={about.at('education')}
           noun="school"
           label="Education"
-          make={() => ({ id: uid(), school: '', degree: '', year: '' })}
+          make={() => ({ id: uid(), school: '', degree: '', year: '', summary: '' })}
           Editor={EducationFields}
           empty={{ icon: GraduationCap, title: 'No education yet', text: 'Add it if it’s useful to the people reading.' }}
         />

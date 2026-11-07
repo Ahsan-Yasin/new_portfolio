@@ -14,6 +14,9 @@ export async function POST(request: Request) {
     const response = await handleUploadPresigned({
       body,
       request,
+      // The SDK insists on this key even though no upload-completed callback is used here,
+      // and stores connected before it existed may not have the variable.
+      webhookPublicKey: process.env.BLOB_WEBHOOK_PUBLIC_KEY ?? 'unused',
       getSignedToken: async (pathname) => {
         if (!(await isAuthenticated())) throw new Error('Not signed in');
         if (!pathname.startsWith('media/')) throw new Error('Invalid upload path');

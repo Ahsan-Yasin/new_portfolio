@@ -37,7 +37,7 @@ export type LoginState = { error?: string };
 export async function loginAction(_previous: LoginState, form: FormData): Promise<LoginState> {
   const status = passwordStatus();
   if (status === 'missing') return { error: 'ADMIN_PASSWORD isn’t set on this deployment.' };
-  if (status === 'too-short') return { error: 'ADMIN_PASSWORD must be at least 12 characters.' };
+  if (status === 'too-short') return { error: 'ADMIN_PASSWORD must be at least 8 characters.' };
 
   const requestHeaders = await headers();
   const client = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';

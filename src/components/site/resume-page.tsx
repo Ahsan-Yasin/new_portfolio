@@ -1,10 +1,15 @@
 import { Download } from 'lucide-react';
+import type { CSSProperties, ReactNode } from 'react';
 import { safeHref, type Content } from '@/lib/content/schema';
 import { PrintButton } from './small-client';
+import './inner-pages.css';
 
-function ResumeSection({ title, children }: { title: string; children: React.ReactNode }) {
+/** Places an element in the entrance sequence. The entrance is plain CSS, so printing and missing scripts can't interrupt it. */
+const enter = (step: number) => ({ '--enter': step }) as CSSProperties;
+
+function ResumeSection({ title, step, children }: { title: string; step: number; children: ReactNode }) {
   return (
-    <section className="grid-12 gap-y-4 border-t border-line py-[clamp(24px,3vw,40px)]">
+    <section style={enter(step)} className="resume-enter grid-12 gap-y-4 border-t border-line py-[clamp(24px,3vw,40px)]">
       <h2 className="col-span-12 text-[1.0625rem] font-semibold tracking-[-0.012em] md:col-span-3">{title}</h2>
       <div className="col-span-12 md:col-span-9">{children}</div>
     </section>
@@ -22,11 +27,17 @@ export function ResumePage({ content }: { content: Content }) {
       <div className="wrap">
         <header className="flex flex-wrap items-start justify-between gap-6 pb-[clamp(28px,3.5vw,48px)]">
           <div>
-            <h1 className="t-display">{profile.name}</h1>
-            <p className="t-lead muted mt-2">{profile.role}</p>
-            <p className="t-small muted mt-3">{contact.join('  ·  ')}</p>
+            <h1 style={enter(0)} className="resume-enter resume-name t-closing">
+              {profile.name}
+            </h1>
+            <p style={enter(1)} className="resume-enter t-lead muted mt-2">
+              {profile.role}
+            </p>
+            <p style={enter(2)} className="resume-enter t-small muted mt-3">
+              {contact.join('  ·  ')}
+            </p>
           </div>
-          <div className="no-print flex flex-wrap gap-2">
+          <div style={enter(2)} className="resume-enter no-print flex flex-wrap gap-2">
             {resumeHref ? (
               <a href={resumeHref} className="btn btn-primary btn-small">
                 <Download size={15} aria-hidden />
@@ -38,16 +49,16 @@ export function ResumePage({ content }: { content: Content }) {
         </header>
 
         {about.intro ? (
-          <ResumeSection title="Profile">
+          <ResumeSection title="Profile" step={3}>
             <p className="max-w-[46em] text-pretty">{about.intro}</p>
           </ResumeSection>
         ) : null}
 
         {experience.length ? (
-          <ResumeSection title="Experience">
+          <ResumeSection title="Experience" step={4}>
             <ol className="grid gap-6">
-              {experience.map((job) => (
-                <li key={job.id} className="resume-entry">
+              {experience.map((job, index) => (
+                <li key={job.id} style={enter(4.5 + Math.min(index, 5) * 0.5)} className="resume-enter resume-entry">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-6">
                     <p className="font-semibold tracking-[-0.012em]">
                       {job.role}, {job.company}
@@ -62,7 +73,7 @@ export function ResumePage({ content }: { content: Content }) {
         ) : null}
 
         {skills.length ? (
-          <ResumeSection title="Skills">
+          <ResumeSection title="Skills" step={6}>
             <dl className="grid gap-3">
               {skills.map((group) => (
                 <div key={group.id} className="grid gap-x-4 sm:grid-cols-[10rem_1fr]">
@@ -75,7 +86,7 @@ export function ResumePage({ content }: { content: Content }) {
         ) : null}
 
         {about.education.length ? (
-          <ResumeSection title="Education">
+          <ResumeSection title="Education" step={7}>
             <ul className="grid gap-2">
               {about.education.map((item) => (
                 <li key={item.id} className="flex flex-wrap items-baseline justify-between gap-x-6">
@@ -91,7 +102,7 @@ export function ResumePage({ content }: { content: Content }) {
         ) : null}
 
         {about.awards.length ? (
-          <ResumeSection title={about.awardsTitle || 'Recognition'}>
+          <ResumeSection title={about.awardsTitle || 'Recognition'} step={8}>
             <ul className="grid gap-2">
               {about.awards.map((award) => (
                 <li key={award.id} className="flex flex-wrap items-baseline justify-between gap-x-6">
