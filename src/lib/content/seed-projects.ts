@@ -1192,7 +1192,7 @@ export const seedProjects: Project[] = [
           "Alarms run on a custom Kotlin engine with a ring service, scheduler and boot receiver, connected to Dart through a MethodChannel and an EventChannel.",
           "Verification strips Arabic vowel marks, compares the text with the bundled Tanzil verses, and accepts partial-verse matches above a minimum length.",
           "The chat and translation client supports both Gemini and Anthropic, and the public build ships with no key, so users paste their own.",
-          "There are 28 test files with about 180 test cases, and a FakeNativeBridge stands in for the Android side."
+          "There are about 180 test cases, and a FakeNativeBridge stands in for the Android side."
         ]
       }
     ]

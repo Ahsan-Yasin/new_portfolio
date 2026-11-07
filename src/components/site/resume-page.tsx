@@ -1,8 +1,13 @@
 import { Download } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
 import { safeHref, type Content } from '@/lib/content/schema';
+import { publishedProjects } from '@/lib/content/select';
+import { SiteLink } from './site-link';
 import { PrintButton } from './small-client';
 import './inner-pages.css';
+
+/** Keeps the printed resume short. The order comes from the project list in the admin. */
+const RESUME_PROJECTS = 6;
 
 /** Places an element in the entrance sequence. The entrance is plain CSS, so printing and missing scripts can't interrupt it. */
 const enter = (step: number) => ({ '--enter': step }) as CSSProperties;
@@ -21,6 +26,7 @@ export function ResumePage({ content }: { content: Content }) {
   const { profile, experience, skills, about } = content;
   const contact = [profile.email, profile.phone, profile.location].filter(Boolean);
   const resumeHref = safeHref(profile.resumeFile);
+  const work = publishedProjects(content).slice(0, RESUME_PROJECTS);
 
   return (
     <div className="resume-sheet sheet-hero pb-[clamp(56px,7vw,104px)] pt-[clamp(120px,16vh,168px)]">
@@ -69,6 +75,24 @@ export function ResumePage({ content }: { content: Content }) {
                 </li>
               ))}
             </ol>
+          </ResumeSection>
+        ) : null}
+
+        {work.length ? (
+          <ResumeSection title="Selected work" step={5}>
+            <ul className="grid gap-5">
+              {work.map((project) => (
+                <li key={project.id}>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-6">
+                    <SiteLink href={`/work/${project.slug}`} className="font-semibold tracking-[-0.012em] hover:underline">
+                      {project.title}
+                    </SiteLink>
+                    <p className="t-small tabular-nums text-ink-3">{project.year}</p>
+                  </div>
+                  <p className="muted mt-1 max-w-[46em] text-pretty">{project.summary}</p>
+                </li>
+              ))}
+            </ul>
           </ResumeSection>
         ) : null}
 
