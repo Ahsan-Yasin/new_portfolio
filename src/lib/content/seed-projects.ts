@@ -20,10 +20,10 @@ export const seedProjects: Project[] = [
     },
     "coverVideo": {
       "src": "/projects/lensbay-landing.mp4",
-      "alt": "LensBay’s landing page: a 3D camera rotates and comes apart into its parts as the page scrolls",
+      "alt": "LensBay’s landing page: a 3D camera comes apart and rotates as the page scrolls",
       "kind": "video",
       "width": 1440,
-      "height": 900,
+      "height": 780,
       "poster": "/projects/lensbay-landing-poster.webp"
     },
     "coverFit": "contain",
@@ -79,14 +79,14 @@ export const seedProjects: Project[] = [
         "id": "b3",
         "type": "media",
         "media": {
-          "src": "/projects/lensbay-landing.mp4",
-          "alt": "A 3D camera rotates and comes apart into its parts as the LensBay landing page scrolls",
+          "src": "/projects/lensbay-recording.mp4",
+          "alt": "A walkthrough of the live LensBay site: the 3D landing page, browsing, search, a listing, repair technicians and parts",
           "kind": "video",
           "width": 1440,
-          "height": 900,
+          "height": 780,
           "poster": "/projects/lensbay-landing-poster.webp"
         },
-        "caption": "The landing page: a 3D camera, built in code with React Three Fiber, rotates and comes apart as you scroll. The checks it lists need AI services that aren’t live yet.",
+        "caption": "A walkthrough of the live site, recorded on an admin account, which is why the listing says it can’t buy. Payments run in test mode, and the checks marked “Not available right now” need AI services that aren’t live yet.",
         "size": "wide",
         "color": "#DDF1EA"
       },
